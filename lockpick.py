@@ -1,6 +1,6 @@
-from discord import Intents, TextChannel, PermissionOverwrite
-from discord.errors import Forbidden, HTTPException
-from discord.ext import commands
+from disnake import Intents, TextChannel, PermissionOverwrite
+from disnake.errors import Forbidden, HTTPException
+from disnake.ext import commands
 from traceback import format_exception
 import logging
 import sys
@@ -38,7 +38,7 @@ class UwU(commands.Bot):
         self.log.info(self.user.id)
         self.log.info("------")
 
-    async def on_command_error(self, ctx, exception):
+    async def on_command_error(self, ctx: commands.Context, exception):
         if isinstance(exception, commands.BotMissingPermissions):
             await ctx.send(content=exception)
             return
@@ -60,14 +60,14 @@ class CommandsCog(commands.Cog):
         self.bot = bot
 
     def has_permrole():
-        async def predicate(ctx):
+        async def predicate(ctx: commands.Context):
             return ctx.bot.access_role.get(ctx.guild.id, None) in [role.id for role in ctx.author.roles]
         return commands.check(predicate)
 
     @commands.command()
     @has_permrole()
     @commands.bot_has_guild_permissions(manage_channels=True)
-    async def lock(self, ctx, c: TextChannel = None):
+    async def lock(self, ctx: commands.Context, c: TextChannel = None):
         c = c or ctx.channel
         try:
             overwrite = c.overwrites[ctx.guild.default_role]
@@ -82,7 +82,7 @@ class CommandsCog(commands.Cog):
     @commands.command()
     @has_permrole()
     @commands.bot_has_guild_permissions(manage_channels=True)
-    async def unlock(self, ctx, c: TextChannel = None):
+    async def unlock(self, ctx: commands.Context, c: TextChannel = None):
         c = c or ctx.channel
         try:
             overwrite = c.overwrites[ctx.guild.default_role]
@@ -98,7 +98,7 @@ class CommandsCog(commands.Cog):
     @commands.command(aliases=["nuke"])
     @has_permrole()
     @commands.bot_has_guild_permissions(ban_members=True)
-    async def massBan(self, ctx, phrase: str):
+    async def massBan(self, ctx: commands.Context, phrase: str):
         async for message in ctx.channel.history(limit=500):
             if phrase.lower() in message.content.lower() and message.author != ctx.author:
                 self.bot.log.info(f"Banning user {message.author}")
